@@ -29,9 +29,9 @@ export function TopNav({ onMenuClick }: TopNavProps) {
         </Button>
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-            <span className="text-primary-foreground font-bold text-sm">M</span>
+            <span className="text-primary-foreground font-bold text-sm">C</span>
           </div>
-          <span className="font-semibold text-lg hidden sm:inline">Mini ATS</span>
+          <span className="font-semibold text-lg hidden sm:inline">Applicant Tracking System</span>
         </div>
       </div>
 

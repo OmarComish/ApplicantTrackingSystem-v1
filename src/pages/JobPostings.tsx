@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus, Pencil, Trash2, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -35,6 +35,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {useConfig} from "@/hooks/use-config";
+import { toast } from "@/hooks/use-toast";
 
 interface Job {
   id: string;
@@ -44,6 +46,13 @@ interface Job {
   status: "active" | "paused" | "closed";
   applicants: number;
   createdAt: string;
+  minSalary: number,
+  maxSalary: number,
+  company: number,
+  description:string,
+  responsibilities: string,
+  requirements: string,
+  type: number,
 }
 
 const initialJobs: Job[] = [
@@ -55,6 +64,8 @@ const initialJobs: Job[] = [
     status: "active",
     applicants: 45,
     createdAt: "2024-01-15",
+    minSalary: 1500.0,
+    maxSalary: 3500.00,
   },
   {
     id: "2",
@@ -64,6 +75,8 @@ const initialJobs: Job[] = [
     status: "active",
     applicants: 32,
     createdAt: "2024-01-10",
+    minSalary: 1500.0,
+    maxSalary: 3500.00,
   },
   {
     id: "3",
@@ -73,6 +86,8 @@ const initialJobs: Job[] = [
     status: "paused",
     applicants: 28,
     createdAt: "2024-01-05",
+    minSalary: 1500.0,
+    maxSalary: 3500.00,
   },
   {
     id: "4",
@@ -82,6 +97,8 @@ const initialJobs: Job[] = [
     status: "active",
     applicants: 22,
     createdAt: "2024-01-01",
+    minSalary: 1500.0,
+    maxSalary: 3500.00,
   },
   {
     id: "5",
@@ -91,20 +108,56 @@ const initialJobs: Job[] = [
     status: "closed",
     applicants: 18,
     createdAt: "2023-12-20",
+    minSalary: 1500.0,
+    maxSalary: 3500.00,
   },
 ];
 
 export default function JobPostings() {
-  const [jobs, setJobs] = useState<Job[]>(initialJobs);
+  //const [jobs, setJobs] = useState<Job[]>(initialJobs);
+  const [jobs, setJobs] = useState([]);
+  const [isLoadingJobs, setIsLoadingJobs] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingJob, setEditingJob] = useState<Job | null>(null);
+  const {config, loading} = useConfig();
   const [formData, setFormData] = useState({
     title: "",
     department: "",
     location: "",
     description: "",
+    responsibilities: "",
+    requirements: "",
+    type: 1,
     status: "active" as Job["status"],
+    minSalary: 0,
+    maxSalary:  0,
   });
+
+  useEffect(()=>{
+     try{
+       if(!config) return;
+       setIsLoadingJobs(true);
+       fetch(`${config.apiBaseUrl}/api/jobpostings`)
+       .then((response)=>{
+          return response.json();
+       })
+       .then((data)=>{
+          const formattedJobs = data.map((job: any)=>({...job, status:
+             job.status === 1 ? "active": job.status===2? "paused": "closed"
+          }));
+           setJobs(formattedJobs);
+       });
+     } catch(error){
+        toast({
+             title: "Data fetch error",
+             description:"Failed to fetch jobs data from the server",
+             variant: "destructive"
+        });
+     } finally {
+       setIsLoadingJobs(false);
+     }
+
+  },[config]);
 
   const handleOpenDialog = (job?: Job) => {
     if (job) {
@@ -115,6 +168,11 @@ export default function JobPostings() {
         location: job.location,
         description: "",
         status: job.status,
+        minSalary: job.minSalary,
+        maxSalary: job.maxSalary,
+        responsibilities: job.responsibilities,
+        requirements: job.requirements,
+        type: job.type
       });
     } else {
       setEditingJob(null);
@@ -124,12 +182,17 @@ export default function JobPostings() {
         location: "",
         description: "",
         status: "active",
+        minSalary: 0,
+        maxSalary: 0,
+        type: 0,
+        responsibilities: "",
+        requirements: "",
       });
     }
     setIsDialogOpen(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async() => {
     if (editingJob) {
       setJobs(
         jobs.map((job) =>
@@ -147,10 +210,75 @@ export default function JobPostings() {
         status: formData.status,
         applicants: 0,
         createdAt: new Date().toISOString().split("T")[0],
+        minSalary: formData.minSalary,
+        maxSalary: formData.maxSalary,
+        company: 1,
+        description: formData.description,
+        responsibilities: formData.responsibilities,
+        type: 1,
+        requirements: formData.requirements
       };
+      
       setJobs([newJob, ...jobs]);
+      const payload = {
+        title: formData.title,
+        requirements: formData.description,
+        department: formData.department,
+        location: formData.location,
+        salaryMin: formData.minSalary,
+        salaryMax: formData.maxSalary,
+        description: formData.description,
+        responsibilities: formData.responsibilities,
+        type: 2,
+        companyId: 3,
+        featured: true,
+        createdByUserId: "Don Self"
+      };
+      console.log(payload);
+      try {
+        const response = await fetch(`${config.apiBaseUrl}/api/jobpostings`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+        if(!response.ok){
+           throw new Error(`We failed to add new job posting ${response.status}`);
+        }
+        const result = await response.json();
+        console.log(result);
+
+        toast({
+          title: "Reservation Created",
+          description: `Job posting for ${formData.title} has been successfully created.`,
+        });
+
+          setFormData({
+            title: "",
+            department: "",
+            location: "",
+            description: "",
+            status: "active",
+            minSalary: 0,
+            maxSalary: 0,
+            type: 0,
+            responsibilities: "",
+            requirements: ""
+          });
+
+         setIsDialogOpen(false);
+
+      } catch (error) {
+          toast({
+            title: "Error",
+            description: "We failed to create Job Posting. Please try again.",
+            variant: "destructive",
+          });
+          console.error('Error creating job posting:', error);
+      }
     }
-    setIsDialogOpen(false);
+   
   };
 
   const handleDelete = (id: string) => {
@@ -208,6 +336,36 @@ export default function JobPostings() {
                   }
                   placeholder="e.g., Senior Frontend Developer"
                 />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                     <Label htmlFor="minSalary">Minimum Salary</Label>
+                     <Input
+                       id ="minSalary"
+                       type="number"
+                       min="0"
+                       step ="0.01"
+                       value ={formData.minSalary}
+                       onChange={(e)=>
+                        setFormData({...formData, minSalary: parseFloat(e.target.value)})
+                       }
+                       placeholder="0.00"
+                     />
+                  </div>
+                  <div className="space-y-2">
+                     <Label htmlFor="maxSalary">Maximum Salary</Label>
+                     <Input
+                       id="maxSalary"
+                       min="1"
+                       type="number"
+                       step="1"
+                       value= {formData.maxSalary}
+                       onChange={(e)=>
+                         setFormData({...formData, maxSalary: parseFloat(e.target.value)})
+                       } 
+                       placeholder="0.00"
+                     />
+                  </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -268,10 +426,34 @@ export default function JobPostings() {
                   onChange={(e) =>
                     setFormData({ ...formData, description: e.target.value })
                   }
-                  placeholder="Job description and requirements..."
+                  placeholder="Job description..."
                   rows={4}
                 />
               </div>
+              <div className="space-y-2">
+                 <Label htmlFor="requirements">Requirements</Label>
+                  <Textarea
+                    id="requirements"
+                    value={formData.requirements}
+                    onChange={(e) =>
+                      setFormData({ ...formData, requirements: e.target.value })
+                    }
+                    placeholder="Job requirements..."
+                    rows={4}
+                  />
+              </div>
+               <div className="space-y-2">
+                  <Label htmlFor="responsibilities">Responsibilities</Label>
+                   <Textarea
+                    id="responsibilities"
+                    value={formData.responsibilities}
+                    onChange={(e) =>
+                      setFormData({ ...formData, responsibilities: e.target.value })
+                    }
+                    placeholder="Job responsibilities..."
+                    rows={4}
+                   />
+               </div>
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
