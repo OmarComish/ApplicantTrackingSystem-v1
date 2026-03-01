@@ -1,4 +1,6 @@
 import { Menu, Bell, Search } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -16,6 +18,14 @@ interface TopNavProps {
 }
 
 export function TopNav({ onMenuClick }: TopNavProps) {
+  const { logout, user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login", { replace: true });
+  };
+
   return (
     <header className="h-16 border-b border-border bg-card px-4 flex items-center justify-between sticky top-0 z-50">
       <div className="flex items-center gap-4">
@@ -57,7 +67,7 @@ export function TopNav({ onMenuClick }: TopNavProps) {
               <Avatar className="h-9 w-9">
                 <AvatarImage src="/placeholder.svg" alt="User" />
                 <AvatarFallback className="bg-primary text-primary-foreground">
-                  JD
+                  {user?.name?.slice(0, 2).toUpperCase() ?? "JD"}
                 </AvatarFallback>
               </Avatar>
             </Button>
@@ -65,15 +75,15 @@ export function TopNav({ onMenuClick }: TopNavProps) {
           <DropdownMenuContent className="w-56" align="end">
             <DropdownMenuLabel>
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium">Jane Doe</p>
-                <p className="text-xs text-muted-foreground">jane@company.com</p>
+                <p className="text-sm font-medium">{user?.name ?? "Jane Doe"}</p>
+                <p className="text-xs text-muted-foreground">{user?.email ?? "jane@company.com"}</p>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>Profile</DropdownMenuItem>
             <DropdownMenuItem>Settings</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive">
+            <DropdownMenuItem className="text-destructive" onClick={handleLogout}>
               Log out
             </DropdownMenuItem>
           </DropdownMenuContent>
