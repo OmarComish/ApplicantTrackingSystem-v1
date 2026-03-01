@@ -336,7 +336,7 @@ export default function Login() {
             </form>
           </div>
 
-          {/* Demo credentials */}
+          {/* Demo credentials 
           <div className="login-demo relative z-10 w-full" style={{ maxWidth: "380px" }}>
             <p className="demo-label">Demo credentials</p>
             <div className="space-y-1.5">
@@ -352,7 +352,7 @@ export default function Login() {
               ))}
             </div>
           </div>
-
+           */}
         </div>
       </div>
     </>
