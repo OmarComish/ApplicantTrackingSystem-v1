@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Eye, UserCheck, UserX, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -35,6 +35,8 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
+import { useConfig } from "@/hooks/use-config";
+import { toast } from "@/hooks/use-toast";
 
 interface Applicant {
   id: string;
@@ -133,12 +135,40 @@ const initialApplicants: Applicant[] = [
 ];
 
 export default function Applicants() {
-  const [applicants, setApplicants] = useState<Applicant[]>(initialApplicants);
+  const [applicants, setApplicants] = useState([]); //<Applicant[]>(initialApplicants);
   const [selectedJob, setSelectedJob] = useState("all");
   const [educationFilter, setEducationFilter] = useState("all");
   const [experienceRange, setExperienceRange] = useState([0, 10]);
   const [selectedApplicant, setSelectedApplicant] = useState<Applicant | null>(null);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const {config, loading} = useConfig();
+  const [isLoadingApplicants, setIsLoadingApplicants] = useState(true);
+
+
+  useEffect(()=>{
+     try {
+         if(!config) return;
+         setIsLoadingApplicants(true);
+        fetch(`${config.apiBaseUrl}/api/applicants/allapplicantlistings`)
+       .then((response)=>{
+          return response.json();
+       })
+       .then((data)=>{
+          console.log(data)
+          const formattedApplicants = data.map((applicant: any)=>({...applicant, status: applicant.status.toLowerCase() }));
+           setApplicants(formattedApplicants);
+       });
+     } catch (error) {
+          toast({
+                title: "Data fetch error",
+                description:"Failed to fetch applicant data from the server",
+                variant: "destructive"
+          });
+     } finally {
+        setIsLoadingApplicants(false);
+     }
+
+  },[config]);
 
   const filteredApplicants = applicants.filter((applicant) => {
     if (selectedJob !== "all" && applicant.jobId !== selectedJob) return false;

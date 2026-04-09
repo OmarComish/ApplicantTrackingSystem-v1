@@ -482,7 +482,7 @@ export default function JobPostings() {
           <TableBody>
             {jobs.map((job) => (
               <TableRow key={job.id} className="hover:bg-muted/30">
-                <TableCell className="font-medium">{job.title}</TableCell>
+                <TableCell className="font-medium">{job.jobTitle}</TableCell>
                 <TableCell>{job.department}</TableCell>
                 <TableCell>{job.location}</TableCell>
                 <TableCell>{job.applicants}</TableCell>
