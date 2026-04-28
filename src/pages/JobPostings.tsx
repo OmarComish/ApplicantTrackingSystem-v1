@@ -55,7 +55,7 @@ interface Job {
   type: number,
 }
 
-const initialJobs: Job[] = [
+/*const initialJobs: Job[] = [
   {
     id: "1",
     title: "Senior Frontend Developer",
@@ -111,7 +111,7 @@ const initialJobs: Job[] = [
     minSalary: 1500.0,
     maxSalary: 3500.00,
   },
-];
+];*/
 
 export default function JobPostings() {
   //const [jobs, setJobs] = useState<Job[]>(initialJobs);
