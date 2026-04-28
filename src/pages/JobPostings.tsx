@@ -234,7 +234,7 @@ export default function JobPostings() {
         featured: true,
         createdByUserId: "Don Self"
       };
-      console.log(payload);
+      //console.log(payload);
       try {
         const response = await fetch(`${config.apiBaseUrl}/api/jobpostings`, {
           method: 'POST',
@@ -247,7 +247,7 @@ export default function JobPostings() {
            throw new Error(`We failed to add new job posting ${response.status}`);
         }
         const result = await response.json();
-        console.log(result);
+        //console.log(result);
 
         toast({
           title: "Reservation Created",
