@@ -142,9 +142,11 @@ export default function JobPostings() {
           return response.json();
        })
        .then((data)=>{
+        console.log(data)
           const formattedJobs = data.map((job: any)=>({...job, status:
-             job.status === 1 ? "active": job.status===2? "paused": "closed"
+             job.status === "Open" ? "active": job.status===2? "paused": "closed"
           }));
+          
            setJobs(formattedJobs);
        });
      } catch(error){
@@ -482,7 +484,7 @@ export default function JobPostings() {
           <TableBody>
             {jobs.map((job) => (
               <TableRow key={job.id} className="hover:bg-muted/30">
-                <TableCell className="font-medium">{job.jobTitle}</TableCell>
+                <TableCell className="font-medium">{job.title}</TableCell>
                 <TableCell>{job.department}</TableCell>
                 <TableCell>{job.location}</TableCell>
                 <TableCell>{job.applicants}</TableCell>
