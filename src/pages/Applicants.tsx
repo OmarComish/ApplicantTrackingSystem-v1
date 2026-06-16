@@ -45,10 +45,11 @@ interface Applicant {
   education: string;
   experience: number;
   score: number;
-  status: "new" | "screening" | "interview" | "shortlisted" | "rejected";
+  status: "new" | "screening" | "interview" | "shortlisted" | "rejected" ;
   jobId: string;
   jobTitle: string;
   resumeSummary: string;
+  reasoning: string;
 }
 
 const jobs = [
@@ -58,7 +59,7 @@ const jobs = [
   { id: "3", title: "UI/UX Designer" },
   { id: "4", title: "Product Manager" },
 ];
-
+/*
 const initialApplicants: Applicant[] = [
   {
     id: "1",
@@ -71,6 +72,7 @@ const initialApplicants: Applicant[] = [
     jobId: "1",
     jobTitle: "Senior Frontend Developer",
     resumeSummary: "Experienced frontend developer with expertise in React, TypeScript, and modern CSS frameworks. Led multiple successful product launches.",
+    reassoning: "Skill match"
   },
   {
     id: "2",
@@ -83,6 +85,7 @@ const initialApplicants: Applicant[] = [
     jobId: "1",
     jobTitle: "Senior Frontend Developer",
     resumeSummary: "Full-stack developer transitioning to frontend. Strong background in user experience and design systems.",
+    reassoning: "Skill match"
   },
   {
     id: "3",
@@ -95,6 +98,7 @@ const initialApplicants: Applicant[] = [
     jobId: "2",
     jobTitle: "Backend Engineer",
     resumeSummary: "Senior backend engineer specializing in distributed systems and microservices architecture.",
+    reassoning: "Skill match"
   },
   {
     id: "4",
@@ -107,6 +111,7 @@ const initialApplicants: Applicant[] = [
     jobId: "3",
     jobTitle: "UI/UX Designer",
     resumeSummary: "Creative designer with a portfolio of award-winning mobile and web applications.",
+    reassoning: "Skill match"
   },
   {
     id: "5",
@@ -119,6 +124,7 @@ const initialApplicants: Applicant[] = [
     jobId: "1",
     jobTitle: "Senior Frontend Developer",
     resumeSummary: "Frontend specialist focused on performance optimization and accessibility.",
+    reassoning: "Skill match"
   },
   {
     id: "6",
@@ -131,8 +137,9 @@ const initialApplicants: Applicant[] = [
     jobId: "4",
     jobTitle: "Product Manager",
     resumeSummary: "Entry-level product enthusiast with strong analytical skills.",
+    reassoning: "Skill match"
   },
-];
+]; */
 
 export default function Applicants() {
   const [applicants, setApplicants] = useState([]); //<Applicant[]>(initialApplicants);
@@ -212,7 +219,11 @@ export default function Applicants() {
     if (score >= 60) return "text-warning";
     return "text-destructive";
   };
-
+  function formatPercentage(value: number | string, decimals = 2): string {
+    const num = typeof value === 'string' ? parseFloat(value) : value;
+    if (isNaN(num)) return value as string; // fallback
+    return `${num.toFixed(decimals)}`;
+  }
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -302,7 +313,7 @@ export default function Applicants() {
                   </TableCell>
                   <TableCell>
                     <span className={getScoreColor(applicant.score)}>
-                      {applicant.score}%
+                      {formatPercentage(applicant.score)}%
                     </span>
                   </TableCell>
                   <TableCell>{getStatusBadge(applicant.status)}</TableCell>
@@ -360,7 +371,7 @@ export default function Applicants() {
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">Score</span>
                   <span className={getScoreColor(selectedApplicant.score)}>
-                    {selectedApplicant.score}%
+                    {formatPercentage(selectedApplicant.score)}%
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
@@ -379,10 +390,16 @@ export default function Applicants() {
                     {selectedApplicant.experience} years
                   </p>
                 </div>
-                <div>
+                {/*<div>
                   <h4 className="font-medium mb-2">Resume Summary</h4>
                   <p className="text-sm text-muted-foreground">
                     {selectedApplicant.resumeSummary}
+                  </p>
+                </div>*/}
+                <div>
+                  <h4 className="font-medium mb-2">Score reasoning</h4>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedApplicant.reasoning}
                   </p>
                 </div>
               </div>

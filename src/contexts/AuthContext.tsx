@@ -57,8 +57,8 @@ export function hasPermission(role: Role, permission: Permission): boolean {
 // ── Seed users ───────────────────────────────────────────────────────────────
 
 export const DEFAULT_USERS: UserProfile[] = [
-  { id: "1", name: "Jane Doe",    email: "admin@codaflem.mw",  role: "Admin",      status: "Active",   password: "admin123", createdAt: "2025-01-10" },
-  { id: "2", name: "John Banda",  email: "john@codaflem.mw",   role: "HR Manager", status: "Active",   password: "hr1234",   createdAt: "2025-02-14" },
+  { id: "1", name: "Jane Doe",    email: "admin@nbs.mw",  role: "Admin",      status: "Active",   password: "admin123", createdAt: "2025-01-10" },
+  { id: "2", name: "John Banda",  email: "john@nbs.mw",   role: "HR Manager", status: "Active",   password: "hr1234",   createdAt: "2025-02-14" },
   { id: "3", name: "Grace Phiri", email: "grace@codaflem.mw",  role: "Recruiter",  status: "Active",   password: "recruit1", createdAt: "2025-03-01" },
   { id: "4", name: "Peter Nkosi", email: "peter@codaflem.mw",  role: "Viewer",     status: "Inactive", password: "viewer1",  createdAt: "2025-03-20" },
 ];

@@ -230,9 +230,9 @@ export default function Login() {
           <div className="relative z-10 flex flex-col h-full p-10">
             <div className="flex items-center gap-2.5">
               <div className="w-9 h-9 rounded-lg bg-sidebar-primary flex items-center justify-center shadow-lg">
-                <span className="text-white font-bold text-sm">C</span>
+                <span className="text-white font-bold text-sm">N</span>
               </div>
-              <span className="font-semibold text-lg tracking-tight">Codaflem-Malawi</span>
+              <span className="font-semibold text-lg tracking-tight">One NICO</span>
             </div>
             <div className="flex-1 flex flex-col justify-center gap-8">
               <div>
@@ -255,7 +255,7 @@ export default function Login() {
                 ))}
               </ul>
             </div>
-            <p className="text-xs text-sidebar-foreground/30">© {new Date().getFullYear()} Codaflem-Malawi ATS</p>
+            <p className="text-xs text-sidebar-foreground/30">© {new Date().getFullYear()} One NICO ATS</p>
           </div>
         </div>
 
@@ -288,7 +288,7 @@ export default function Login() {
                 style={{ background: "#2563eb", boxShadow: "0 4px 14px rgba(37,99,235,0.45)" }}>
                 <Briefcase className="w-4 h-4 text-white" />
               </div>
-              <span className="font-semibold text-lg login-title">Codaflem-Malawi</span>
+              <span className="font-semibold text-lg login-title">One NICO</span>
             </div>
 
             <div className="mb-6">

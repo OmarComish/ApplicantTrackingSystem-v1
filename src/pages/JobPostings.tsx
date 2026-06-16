@@ -236,7 +236,7 @@ export default function JobPostings() {
         featured: true,
         createdByUserId: "Don Self"
       };
-      //console.log(payload);
+      console.log(payload);
       try {
         const response = await fetch(`${config.apiBaseUrl}/api/jobpostings`, {
           method: 'POST',
@@ -382,11 +382,15 @@ export default function JobPostings() {
                       <SelectValue placeholder="Select department" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Engineering">Engineering</SelectItem>
-                      <SelectItem value="Design">Design</SelectItem>
-                      <SelectItem value="Product">Product</SelectItem>
-                      <SelectItem value="Marketing">Marketing</SelectItem>
-                      <SelectItem value="Sales">Sales</SelectItem>
+                      <SelectItem value="Engineering">Treasury</SelectItem>
+                      <SelectItem value="Design">Internation Trade</SelectItem>
+                      <SelectItem value="Product">ICT</SelectItem>
+                      <SelectItem value="Marketing">Operations</SelectItem>
+                      <SelectItem value="Sales">National Sales</SelectItem>
+                      <SelectItem value="Sales">Agribusiness</SelectItem>
+                      <SelectItem value="Sales">Marketing and Customer Experience</SelectItem>
+                      <SelectItem value="Sales">Compliance</SelectItem>
+                      <SelectItem value="Sales">Legal</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
