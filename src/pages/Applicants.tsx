@@ -45,7 +45,7 @@ interface Applicant {
   education: string;
   experience: number;
   score: number;
-  status: "new" | "screening" | "interview" | "shortlisted" | "rejected" ;
+  status: "new" | "screening" | "interviewing" | "shortlisted" | "rejected" | "reviewing" | "interviewing" | "offered";
   jobId: string;
   jobTitle: string;
   resumeSummary: string;
@@ -59,90 +59,10 @@ const jobs = [
   { id: "3", title: "UI/UX Designer" },
   { id: "4", title: "Product Manager" },
 ];
-/*
-const initialApplicants: Applicant[] = [
-  {
-    id: "1",
-    name: "Alex Johnson",
-    email: "alex@email.com",
-    education: "Bachelor's",
-    experience: 5,
-    score: 92,
-    status: "shortlisted",
-    jobId: "1",
-    jobTitle: "Senior Frontend Developer",
-    resumeSummary: "Experienced frontend developer with expertise in React, TypeScript, and modern CSS frameworks. Led multiple successful product launches.",
-    reassoning: "Skill match"
-  },
-  {
-    id: "2",
-    name: "Sarah Williams",
-    email: "sarah@email.com",
-    education: "Master's",
-    experience: 3,
-    score: 88,
-    status: "interview",
-    jobId: "1",
-    jobTitle: "Senior Frontend Developer",
-    resumeSummary: "Full-stack developer transitioning to frontend. Strong background in user experience and design systems.",
-    reassoning: "Skill match"
-  },
-  {
-    id: "3",
-    name: "Michael Chen",
-    email: "michael@email.com",
-    education: "PhD",
-    experience: 7,
-    score: 95,
-    status: "shortlisted",
-    jobId: "2",
-    jobTitle: "Backend Engineer",
-    resumeSummary: "Senior backend engineer specializing in distributed systems and microservices architecture.",
-    reassoning: "Skill match"
-  },
-  {
-    id: "4",
-    name: "Emily Davis",
-    email: "emily@email.com",
-    education: "Bachelor's",
-    experience: 2,
-    score: 75,
-    status: "screening",
-    jobId: "3",
-    jobTitle: "UI/UX Designer",
-    resumeSummary: "Creative designer with a portfolio of award-winning mobile and web applications.",
-    reassoning: "Skill match"
-  },
-  {
-    id: "5",
-    name: "James Wilson",
-    email: "james@email.com",
-    education: "Master's",
-    experience: 4,
-    score: 82,
-    status: "new",
-    jobId: "1",
-    jobTitle: "Senior Frontend Developer",
-    resumeSummary: "Frontend specialist focused on performance optimization and accessibility.",
-    reassoning: "Skill match"
-  },
-  {
-    id: "6",
-    name: "Lisa Anderson",
-    email: "lisa@email.com",
-    education: "Bachelor's",
-    experience: 1,
-    score: 65,
-    status: "rejected",
-    jobId: "4",
-    jobTitle: "Product Manager",
-    resumeSummary: "Entry-level product enthusiast with strong analytical skills.",
-    reassoning: "Skill match"
-  },
-]; */
+
 
 export default function Applicants() {
-  const [applicants, setApplicants] = useState([]); //<Applicant[]>(initialApplicants);
+  const [applicants, setApplicants] = useState<Applicant[]>([]); //<Applicant[]>(initialApplicants);
   const [selectedJob, setSelectedJob] = useState("all");
   const [educationFilter, setEducationFilter] = useState("all");
   const [experienceRange, setExperienceRange] = useState([0, 10]);
@@ -150,7 +70,7 @@ export default function Applicants() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const {config, loading} = useConfig();
   const [isLoadingApplicants, setIsLoadingApplicants] = useState(true);
-
+  const [updatingStatusId, setUpdatingStatusId]= useState<string | null>(null);
 
   useEffect(()=>{
      try {
@@ -184,13 +104,63 @@ export default function Applicants() {
     return true;
   });
 
-  const handleStatusChange = (id: string, newStatus: Applicant["status"]) => {
-    setApplicants(
-      applicants.map((a) => (a.id === id ? { ...a, status: newStatus } : a))
-    );
-    setIsProfileOpen(false);
+  const handleStatusChange = async(id: string, newStatus: Applicant["status"]) => {
+
+    if(!config) {
+       toast({
+          title: "Configuration error",
+          description: "API base url not available",
+          variant: "destructive",
+       });
+       return;
+    }
+    try {
+       setUpdatingStatusId(id);
+       const response = await fetch(`${config.apiBaseUrl}/api/applicants/${id}/status`,{
+           method: "PATCH",
+           headers: {
+             "Content-Type": "application/json",
+           },
+           body: JSON.stringify({Status: statusMap[newStatus], Comments: `Status changed to ${newStatus}`}),
+        });
+
+        if(!response.ok){
+          const errorText = await response.text();
+          console.error("Server error response:", errorText);
+          throw new Error(`HTTP error! Status: ${response.status} :${errorText}`);
+        }
+
+        setApplicants(
+         applicants.map((a) => (a.id === id ? { ...a, status: newStatus } : a))
+        );
+        toast({title: "Status updated", description: `Applicant status changed to ${newStatus}`});
+
+        setIsProfileOpen(false);
+
+    } catch (error) {
+       toast({
+         title: "Error",
+         description: "We failed to update applicant status. Please try again. If the problem persist contact help desk",
+         variant: "destructive",
+
+       });
+    } finally {
+       setUpdatingStatusId(null);
+    }
+
   };
 
+  // Map status strings to integer enum values (assuming 1-based order)
+  const statusMap: Record<Applicant["status"], number> ={
+    new        :0,
+    reviewing  :2,
+    screening  :3,
+    shortlisted:4,
+    interviewing :5,
+    offered      :6,
+    rejected     :7,
+  };
+ 
   const getStatusBadge = (status: Applicant["status"]) => {
     const variants = {
       new: "bg-primary/10 text-primary border-primary/20",
@@ -198,6 +168,7 @@ export default function Applicants() {
       interview: "bg-warning/10 text-warning border-warning/20",
       shortlisted: "bg-success/10 text-success border-success/20",
       rejected: "bg-destructive/10 text-destructive border-destructive/20",
+  
     };
     const labels = {
       new: "New",
